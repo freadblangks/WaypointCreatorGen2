@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -11,6 +13,7 @@ namespace WaypointCreatorGen2
     {
         // Dictionary<UInt32 /*CreatureID*/, Dictionary<UInt64 /*lowGUID*/, List<WaypointInfo>>>
         Dictionary<UInt32, Dictionary<UInt64, List<WaypointInfo>>> WaypointDatabyCreatureEntry = new Dictionary<UInt32, Dictionary<UInt64, List<WaypointInfo>>>();
+        Dictionary<UInt32, string> CreatureNamesByEntry = new Dictionary<uint, string>();
 
         DataGridViewRow[] CopiedDataGridRows;
         private uint _selectedCreatureId = 0;
@@ -57,6 +60,7 @@ namespace WaypointCreatorGen2
         // Parses all waypoint data from the provided file and returns a container filled with all needed data
         private Dictionary<UInt32, Dictionary<UInt64, List<WaypointInfo>>> GetWaypointDataFromSniff(String filePath)
         {
+            CreatureNamesByEntry.Clear();
             Dictionary<UInt32, Dictionary<UInt64, List<WaypointInfo>>> result = new Dictionary<UInt32, Dictionary<UInt64, List<WaypointInfo>>>();
 
             using (System.IO.StreamReader file = new System.IO.StreamReader(filePath))
@@ -69,6 +73,7 @@ namespace WaypointCreatorGen2
                         WaypointInfo wpInfo = new WaypointInfo();
                         UInt32 creatureId = 0;
                         UInt64 lowGuid = 0;
+                        string creatureName = "Unknown";
 
                         // Extracting the packet timestamp in milliseconds from the packet header for delay calculations
                         string[] packetHeader = line.Split(new char[] { ' ' });
@@ -103,6 +108,13 @@ namespace WaypointCreatorGen2
                                 // Skip invalid data.
                                 if (creatureId == 0 || lowGuid == 0)
                                     break;
+
+                                string pattern = @"Entry:\s\d+\s\((.*)\)";
+                                Regex regex = new Regex(pattern);
+                                Match match = regex.Match(line);
+
+                                if (match.Success)
+                                    creatureName = match.Groups[1].Value;
                             }
 
                             // Extracting spline duration
@@ -154,7 +166,10 @@ namespace WaypointCreatorGen2
 
                                 // Everything gathered, time to store the data
                                 if (!result.ContainsKey(creatureId))
+                                {
+                                    CreatureNamesByEntry.Add(creatureId, creatureName);
                                     result.Add(creatureId, new Dictionary<UInt64, List<WaypointInfo>>());
+                                }
 
                                 if (!result[creatureId].ContainsKey(lowGuid))
                                     result[creatureId].Add(lowGuid, new List<WaypointInfo>());
@@ -194,14 +209,22 @@ namespace WaypointCreatorGen2
             if (creatureId == 0)
             {
                 foreach (var waypointsByEntry in WaypointDatabyCreatureEntry)
+                {
+                    CreatureNamesByEntry.TryGetValue(waypointsByEntry.Key, out var name);
                     foreach (var waypointsByGuid in waypointsByEntry.Value)
-                        EditorListBox.Items.Add(waypointsByEntry.Key.ToString() + " (" + waypointsByGuid.Key.ToString() + ")");
+                        EditorListBox.Items.Add($"{waypointsByEntry.Key} - {name} ({waypointsByGuid.Key})");
+                }
+
             }
             else
             {
                 if (WaypointDatabyCreatureEntry.ContainsKey(creatureId))
+                {
+                    CreatureNamesByEntry.TryGetValue(creatureId, out var name);
                     foreach (var waypointsByGuid in WaypointDatabyCreatureEntry[creatureId])
-                        EditorListBox.Items.Add(creatureId.ToString() + " (" + waypointsByGuid.Key.ToString() + ")");
+                        EditorListBox.Items.Add($"{creatureId} - {name} ({waypointsByGuid.Key.ToString()})");
+                }
+
             }
         }
 
@@ -286,11 +309,16 @@ namespace WaypointCreatorGen2
             if (EditorListBox.SelectedIndex == -1)
                 return;
 
-            string[] words = EditorListBox.SelectedItem.ToString().Replace("(", "").Replace(")", "").Split(new char[] { ' ' });
+            string pattern = @"^(\d+).*\((\d+)\)";
 
-            UInt32 creatureId = UInt32.Parse(words[0]);
-            UInt64 lowGuid = UInt64.Parse(words[1]);
-            ShowWaypointDataForCreature(creatureId, lowGuid);
+            Regex regex = new Regex(pattern);
+            Match match = regex.Match(EditorListBox.SelectedItem.ToString());
+            if (match.Success)
+            {
+                uint creatureId = uint.Parse(match.Groups[1].Value);
+                ulong lowGuid = ulong.Parse(match.Groups[2].Value);
+                ShowWaypointDataForCreature(creatureId, lowGuid);
+            }
         }
 
         private void CutStripMenuItem_Click(object sender, EventArgs e)
@@ -389,12 +417,14 @@ namespace WaypointCreatorGen2
         {
             // Generates the SQL output.
             // waypoint_data
+            CreatureNamesByEntry.TryGetValue(_selectedCreatureId, out string name);
+
             SQLOutputTextBox.AppendText($"SET @ENTRY := {_selectedCreatureId};\r\n");
             SQLOutputTextBox.AppendText("SET @PATHOFFSET := 0;\r\n");
             SQLOutputTextBox.AppendText("SET @PATH := @ENTRY * 100 + @PATHOFFSET;\r\n");
             SQLOutputTextBox.AppendText("DELETE FROM `waypoint_path` WHERE `PathId`= @PATH;\r\n");
             SQLOutputTextBox.AppendText("INSERT INTO `waypoint_path` (`PathId`, `MoveType`, `Flags`, `Comment`) VALUES\r\n");
-            SQLOutputTextBox.AppendText("(@PATH, 0, 0, '<fill comment here>');\r\n");
+            SQLOutputTextBox.AppendText($"(@PATH, 0, 0, '{name} - Idle');\r\n");
             SQLOutputTextBox.AppendText("\r\n");
 
             SQLOutputTextBox.AppendText("DELETE FROM `waypoint_path_node` WHERE `PathId`= @PATH;\r\n");
