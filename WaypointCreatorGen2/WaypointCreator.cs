@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -16,8 +17,10 @@ namespace WaypointCreatorGen2
         Dictionary<UInt32, string> CreatureNamesByEntry = new Dictionary<uint, string>();
 
         DataGridViewRow[] CopiedDataGridRows;
+        private (uint, ulong) SelectedRow = (0, 0);
         private uint _selectedCreatureId = 0;
 
+        private const int SEQUENCE_TO_CHECK_FOR_DUPLICATES = 3;
 
         public WaypointCreator()
         {
@@ -241,6 +244,8 @@ namespace WaypointCreatorGen2
 
             if (WaypointDatabyCreatureEntry[creatureId].ContainsKey(lowGUID))
             {
+                SelectedRow = (creatureId, lowGUID);
+
                 int count = 0;
                 foreach (WaypointInfo wpInfo in WaypointDatabyCreatureEntry[creatureId][lowGUID])
                 {
@@ -472,6 +477,99 @@ namespace WaypointCreatorGen2
             if (dialog.ShowDialog() == DialogResult.OK)
                 File.WriteAllText(dialog.FileName, SQLOutputTextBox.Text, System.Text.Encoding.UTF8);
         }
+
+        int GetIndexOfWaypointInfo(List<WaypointInfo> wpList, WaypointInfo wpInfo, int startIndex)
+        {
+            for (var i = startIndex; i < wpList.Count; i++)
+            {
+                if (wpList[i].Position.Equals(wpInfo.Position))
+                    return i;
+            }
+            return -1;
+        }
+
+        List<WaypointInfo> GetDeduplicatedWaypointList(List<WaypointInfo> wpList)
+        {
+            List<WaypointInfo> uniqueWpInfo = new List<WaypointInfo>();
+            var sequenceIndex = -1;
+            var duplicateSequenceFound = 0;
+            var duplicateSequenceStart = 0;
+            for (var i = 0; i < wpList.Count; i++)
+            {
+                WaypointInfo wpInfo = wpList[i];
+
+                // skip unnecessary duplicate chains of same coords
+                if (uniqueWpInfo.Count > 0 && wpInfo.Position.GetEuclideanDistance(uniqueWpInfo.Last().Position) < 0.5f)
+                    continue;
+
+                var newIndex = i + 1;
+                if (sequenceIndex != -1)
+                {
+                    newIndex = sequenceIndex;
+                    sequenceIndex = GetIndexOfWaypointInfo(wpList, wpInfo, newIndex);
+                    if (sequenceIndex != -1 && newIndex + 1 == sequenceIndex)
+                    {
+                        duplicateSequenceFound++;
+                        if (duplicateSequenceFound >= SEQUENCE_TO_CHECK_FOR_DUPLICATES)
+                        {
+                            // add remaining elements until duplicate sequence
+                            for (var k = i; k < duplicateSequenceStart; k++)
+                            {
+                                if (wpList[k].Position.GetEuclideanDistance(uniqueWpInfo.Last().Position) < 1.0f)
+                                    continue;
+
+                                // skip if start is duplicated at the end because it was found inbetween sequence
+                                if (k == duplicateSequenceStart - 1 && wpList[k].Position.Equals(uniqueWpInfo.First().Position))
+                                    continue;
+                                uniqueWpInfo.Add(wpList[k]);
+                            }
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        duplicateSequenceFound = 0;
+                        duplicateSequenceStart = sequenceIndex;
+                    }
+                }
+                else
+                {
+                    sequenceIndex = GetIndexOfWaypointInfo(wpList, wpInfo, newIndex);
+                    duplicateSequenceFound = sequenceIndex != -1 ? 1 : 0;
+                    duplicateSequenceStart = sequenceIndex;
+                }
+                uniqueWpInfo.Add(wpInfo);
+            }
+            return uniqueWpInfo;
+        }
+
+        private void RemoveDuplicatesButton_Click(object sender, EventArgs e)
+        {
+            EditorGridView.Rows.Clear();
+
+            var wpList = WaypointDatabyCreatureEntry[SelectedRow.Item1][SelectedRow.Item2];
+
+            var count = 0;
+            foreach (var wpInfo in GetDeduplicatedWaypointList(wpList))
+            {
+                string orientation = "NULL";
+                if (wpInfo.Position.Orientation.HasValue)
+                    orientation = wpInfo.Position.Orientation.Value.ToString(CultureInfo.InvariantCulture);
+
+                EditorGridView.Rows.Add(
+                    count,
+                    wpInfo.Position.PositionX.ToString(CultureInfo.InvariantCulture),
+                    wpInfo.Position.PositionY.ToString(CultureInfo.InvariantCulture),
+                    wpInfo.Position.PositionZ.ToString(CultureInfo.InvariantCulture),
+                    orientation,
+                    wpInfo.MoveTime,
+                    wpInfo.Delay);
+
+                count++;
+            }
+
+            BuildGraphPath();
+        }
     }
 
     public class WaypointInfo
@@ -489,6 +587,37 @@ namespace WaypointCreatorGen2
         public float PositionY = 0f;
         public float PositionZ = 0f;
         public float? Orientation;
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+
+            WaypointPosition otherPosition = (WaypointPosition)obj;
+            return PositionX == otherPosition.PositionX &&
+                   PositionY == otherPosition.PositionY &&
+                   PositionZ == otherPosition.PositionZ;
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = 17;
+            hash = hash * 23 + PositionX.GetHashCode();
+            hash = hash * 23 + PositionY.GetHashCode();
+            hash = hash * 23 + PositionZ.GetHashCode();
+            return hash;
+        }
+
+        public float GetEuclideanDistance(WaypointPosition pos)
+        {
+            float deltaX = PositionX - pos.PositionX;
+            float deltaY = PositionY - pos.PositionY;
+            float deltaZ = PositionZ - pos.PositionZ;
+
+            float distanceSquared = deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ;
+
+            return (float)Math.Sqrt(distanceSquared);
+        }
     }
 
     public class SplinePosition

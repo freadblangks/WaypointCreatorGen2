@@ -30,21 +30,32 @@ namespace WaypointCreatorGen2
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.TabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.SplineGridView = new System.Windows.Forms.DataGridView();
+            this.SplineGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.SplineGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.SplineGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.SplineGridViewTextBoxColumn4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.SplineGridViewTextBoxColumn5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.GridViewContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.CutStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.CopyStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.PasteAboveStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.PasteBelowStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.GenerateSQLStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.EditorGridView = new System.Windows.Forms.DataGridView();
             this.ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.PositionX = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -53,12 +64,6 @@ namespace WaypointCreatorGen2
             this.Orientation = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.MoveTime = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Delay = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.GridViewContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.CutStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.CopyStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.PasteAboveStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.PasteBelowStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.GenerateSQLStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.EditorListBox = new System.Windows.Forms.ListBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -74,24 +79,19 @@ namespace WaypointCreatorGen2
             this.SQLOutputTextBox = new System.Windows.Forms.TextBox();
             this.SQLOutputToolStrip = new System.Windows.Forms.ToolStrip();
             this.SQLOutputSaveButton = new System.Windows.Forms.ToolStripButton();
-            this.SplineGridView = new System.Windows.Forms.DataGridView();
-            this.SplineGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.SplineGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.SplineGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.SplineGridViewTextBoxColumn4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.SplineGridViewTextBoxColumn5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.RemoveDuplicatesButton = new System.Windows.Forms.Button();
             this.TabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.EditorGridView)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.SplineGridView)).BeginInit();
             this.GridViewContextMenuStrip.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.EditorGridView)).BeginInit();
             this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.EditorWaypointChart)).BeginInit();
             this.EditorToolStrip.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.SQLOutputToolStrip.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.SplineGridView)).BeginInit();
             this.SuspendLayout();
             // 
             // TabControl
@@ -120,6 +120,7 @@ namespace WaypointCreatorGen2
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.RemoveDuplicatesButton);
             this.groupBox3.Controls.Add(this.SplineGridView);
             this.groupBox3.Controls.Add(this.EditorGridView);
             this.groupBox3.Location = new System.Drawing.Point(726, 31);
@@ -128,6 +129,128 @@ namespace WaypointCreatorGen2
             this.groupBox3.TabIndex = 4;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Data Table";
+            // 
+            // SplineGridView
+            // 
+            this.SplineGridView.AllowUserToAddRows = false;
+            this.SplineGridView.AllowUserToDeleteRows = false;
+            this.SplineGridView.AllowUserToResizeColumns = false;
+            this.SplineGridView.AllowUserToResizeRows = false;
+            this.SplineGridView.BackgroundColor = System.Drawing.SystemColors.ButtonFace;
+            this.SplineGridView.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
+            this.SplineGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.SplineGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.SplineGridViewTextBoxColumn1,
+            this.SplineGridViewTextBoxColumn2,
+            this.SplineGridViewTextBoxColumn3,
+            this.SplineGridViewTextBoxColumn4,
+            this.SplineGridViewTextBoxColumn5});
+            this.SplineGridView.ContextMenuStrip = this.GridViewContextMenuStrip;
+            this.SplineGridView.Location = new System.Drawing.Point(7, 286);
+            this.SplineGridView.Name = "SplineGridView";
+            this.SplineGridView.RowHeadersWidth = 62;
+            this.SplineGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
+            this.SplineGridView.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.SplineGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.SplineGridView.Size = new System.Drawing.Size(553, 200);
+            this.SplineGridView.TabIndex = 1;
+            // 
+            // SplineGridViewTextBoxColumn1
+            // 
+            this.SplineGridViewTextBoxColumn1.HeaderText = "PointID";
+            this.SplineGridViewTextBoxColumn1.MinimumWidth = 8;
+            this.SplineGridViewTextBoxColumn1.Name = "SplineGridViewTextBoxColumn1";
+            this.SplineGridViewTextBoxColumn1.ReadOnly = true;
+            this.SplineGridViewTextBoxColumn1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Programmatic;
+            this.SplineGridViewTextBoxColumn1.Width = 50;
+            // 
+            // SplineGridViewTextBoxColumn2
+            // 
+            this.SplineGridViewTextBoxColumn2.HeaderText = "SplinePointIndex";
+            this.SplineGridViewTextBoxColumn2.MinimumWidth = 8;
+            this.SplineGridViewTextBoxColumn2.Name = "SplineGridViewTextBoxColumn2";
+            this.SplineGridViewTextBoxColumn2.ReadOnly = true;
+            this.SplineGridViewTextBoxColumn2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Programmatic;
+            // 
+            // SplineGridViewTextBoxColumn3
+            // 
+            dataGridViewCellStyle1.NullValue = "0.0";
+            this.SplineGridViewTextBoxColumn3.DefaultCellStyle = dataGridViewCellStyle1;
+            this.SplineGridViewTextBoxColumn3.HeaderText = "PositionX";
+            this.SplineGridViewTextBoxColumn3.MinimumWidth = 8;
+            this.SplineGridViewTextBoxColumn3.Name = "SplineGridViewTextBoxColumn3";
+            this.SplineGridViewTextBoxColumn3.ReadOnly = true;
+            this.SplineGridViewTextBoxColumn3.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.SplineGridViewTextBoxColumn3.Width = 80;
+            // 
+            // SplineGridViewTextBoxColumn4
+            // 
+            dataGridViewCellStyle2.NullValue = null;
+            this.SplineGridViewTextBoxColumn4.DefaultCellStyle = dataGridViewCellStyle2;
+            this.SplineGridViewTextBoxColumn4.HeaderText = "PositionY";
+            this.SplineGridViewTextBoxColumn4.MinimumWidth = 8;
+            this.SplineGridViewTextBoxColumn4.Name = "SplineGridViewTextBoxColumn4";
+            this.SplineGridViewTextBoxColumn4.ReadOnly = true;
+            this.SplineGridViewTextBoxColumn4.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.SplineGridViewTextBoxColumn4.Width = 80;
+            // 
+            // SplineGridViewTextBoxColumn5
+            // 
+            dataGridViewCellStyle3.NullValue = null;
+            this.SplineGridViewTextBoxColumn5.DefaultCellStyle = dataGridViewCellStyle3;
+            this.SplineGridViewTextBoxColumn5.HeaderText = "PositionZ";
+            this.SplineGridViewTextBoxColumn5.MinimumWidth = 8;
+            this.SplineGridViewTextBoxColumn5.Name = "SplineGridViewTextBoxColumn5";
+            this.SplineGridViewTextBoxColumn5.ReadOnly = true;
+            this.SplineGridViewTextBoxColumn5.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.SplineGridViewTextBoxColumn5.Width = 80;
+            // 
+            // GridViewContextMenuStrip
+            // 
+            this.GridViewContextMenuStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
+            this.GridViewContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.CutStripMenuItem,
+            this.CopyStripMenuItem,
+            this.PasteAboveStripMenuItem,
+            this.PasteBelowStripMenuItem,
+            this.GenerateSQLStripMenuItem});
+            this.GridViewContextMenuStrip.Name = "GridViewContextMenuStrip";
+            this.GridViewContextMenuStrip.Size = new System.Drawing.Size(192, 164);
+            // 
+            // CutStripMenuItem
+            // 
+            this.CutStripMenuItem.Name = "CutStripMenuItem";
+            this.CutStripMenuItem.Size = new System.Drawing.Size(191, 32);
+            this.CutStripMenuItem.Text = "Cut";
+            this.CutStripMenuItem.Click += new System.EventHandler(this.CutStripMenuItem_Click);
+            // 
+            // CopyStripMenuItem
+            // 
+            this.CopyStripMenuItem.Name = "CopyStripMenuItem";
+            this.CopyStripMenuItem.Size = new System.Drawing.Size(191, 32);
+            this.CopyStripMenuItem.Text = "Copy";
+            this.CopyStripMenuItem.Click += new System.EventHandler(this.CopyStripMenuItem_Click);
+            // 
+            // PasteAboveStripMenuItem
+            // 
+            this.PasteAboveStripMenuItem.Name = "PasteAboveStripMenuItem";
+            this.PasteAboveStripMenuItem.Size = new System.Drawing.Size(191, 32);
+            this.PasteAboveStripMenuItem.Text = "Paste Above";
+            this.PasteAboveStripMenuItem.Click += new System.EventHandler(this.PasteAboveStripMenuItem_Click);
+            // 
+            // PasteBelowStripMenuItem
+            // 
+            this.PasteBelowStripMenuItem.Name = "PasteBelowStripMenuItem";
+            this.PasteBelowStripMenuItem.Size = new System.Drawing.Size(191, 32);
+            this.PasteBelowStripMenuItem.Text = "Paste Below";
+            this.PasteBelowStripMenuItem.Click += new System.EventHandler(this.PasteBelowStripMenuItem_Click);
+            // 
+            // GenerateSQLStripMenuItem
+            // 
+            this.GenerateSQLStripMenuItem.Name = "GenerateSQLStripMenuItem";
+            this.GenerateSQLStripMenuItem.Size = new System.Drawing.Size(191, 32);
+            this.GenerateSQLStripMenuItem.Text = "Generate SQL";
+            this.GenerateSQLStripMenuItem.Click += new System.EventHandler(this.GenerateSQLStripMenuItem_Click);
             // 
             // EditorGridView
             // 
@@ -149,6 +272,7 @@ namespace WaypointCreatorGen2
             this.EditorGridView.ContextMenuStrip = this.GridViewContextMenuStrip;
             this.EditorGridView.Location = new System.Drawing.Point(7, 14);
             this.EditorGridView.Name = "EditorGridView";
+            this.EditorGridView.RowHeadersWidth = 62;
             this.EditorGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this.EditorGridView.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.EditorGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
@@ -158,6 +282,7 @@ namespace WaypointCreatorGen2
             // ID
             // 
             this.ID.HeaderText = "ID";
+            this.ID.MinimumWidth = 8;
             this.ID.Name = "ID";
             this.ID.ReadOnly = true;
             this.ID.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Programmatic;
@@ -165,9 +290,10 @@ namespace WaypointCreatorGen2
             // 
             // PositionX
             // 
-            dataGridViewCellStyle5.NullValue = "0.0";
-            this.PositionX.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle4.NullValue = "0.0";
+            this.PositionX.DefaultCellStyle = dataGridViewCellStyle4;
             this.PositionX.HeaderText = "PositionX";
+            this.PositionX.MinimumWidth = 8;
             this.PositionX.Name = "PositionX";
             this.PositionX.ReadOnly = true;
             this.PositionX.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
@@ -175,9 +301,10 @@ namespace WaypointCreatorGen2
             // 
             // PositionY
             // 
-            dataGridViewCellStyle6.NullValue = null;
-            this.PositionY.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle5.NullValue = null;
+            this.PositionY.DefaultCellStyle = dataGridViewCellStyle5;
             this.PositionY.HeaderText = "PositionY";
+            this.PositionY.MinimumWidth = 8;
             this.PositionY.Name = "PositionY";
             this.PositionY.ReadOnly = true;
             this.PositionY.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
@@ -185,9 +312,10 @@ namespace WaypointCreatorGen2
             // 
             // PositionZ
             // 
-            dataGridViewCellStyle7.NullValue = null;
-            this.PositionZ.DefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle6.NullValue = null;
+            this.PositionZ.DefaultCellStyle = dataGridViewCellStyle6;
             this.PositionZ.HeaderText = "PositionZ";
+            this.PositionZ.MinimumWidth = 8;
             this.PositionZ.Name = "PositionZ";
             this.PositionZ.ReadOnly = true;
             this.PositionZ.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
@@ -195,9 +323,10 @@ namespace WaypointCreatorGen2
             // 
             // Orientation
             // 
-            dataGridViewCellStyle8.NullValue = null;
-            this.Orientation.DefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle7.NullValue = null;
+            this.Orientation.DefaultCellStyle = dataGridViewCellStyle7;
             this.Orientation.HeaderText = "Orientation";
+            this.Orientation.MinimumWidth = 8;
             this.Orientation.Name = "Orientation";
             this.Orientation.ReadOnly = true;
             this.Orientation.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
@@ -206,6 +335,7 @@ namespace WaypointCreatorGen2
             // MoveTime
             // 
             this.MoveTime.HeaderText = "MoveTime";
+            this.MoveTime.MinimumWidth = 8;
             this.MoveTime.Name = "MoveTime";
             this.MoveTime.ReadOnly = true;
             this.MoveTime.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
@@ -214,56 +344,11 @@ namespace WaypointCreatorGen2
             // Delay
             // 
             this.Delay.HeaderText = "Delay";
+            this.Delay.MinimumWidth = 8;
             this.Delay.Name = "Delay";
             this.Delay.ReadOnly = true;
             this.Delay.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.Delay.Width = 80;
-            // 
-            // GridViewContextMenuStrip
-            // 
-            this.GridViewContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.CutStripMenuItem,
-            this.CopyStripMenuItem,
-            this.PasteAboveStripMenuItem,
-            this.PasteBelowStripMenuItem,
-            this.GenerateSQLStripMenuItem});
-            this.GridViewContextMenuStrip.Name = "GridViewContextMenuStrip";
-            this.GridViewContextMenuStrip.Size = new System.Drawing.Size(146, 114);
-            // 
-            // CutStripMenuItem
-            // 
-            this.CutStripMenuItem.Name = "CutStripMenuItem";
-            this.CutStripMenuItem.Size = new System.Drawing.Size(145, 22);
-            this.CutStripMenuItem.Text = "Cut";
-            this.CutStripMenuItem.Click += new System.EventHandler(this.CutStripMenuItem_Click);
-            // 
-            // CopyStripMenuItem
-            // 
-            this.CopyStripMenuItem.Name = "CopyStripMenuItem";
-            this.CopyStripMenuItem.Size = new System.Drawing.Size(145, 22);
-            this.CopyStripMenuItem.Text = "Copy";
-            this.CopyStripMenuItem.Click += new System.EventHandler(this.CopyStripMenuItem_Click);
-            // 
-            // PasteAboveStripMenuItem
-            // 
-            this.PasteAboveStripMenuItem.Name = "PasteAboveStripMenuItem";
-            this.PasteAboveStripMenuItem.Size = new System.Drawing.Size(145, 22);
-            this.PasteAboveStripMenuItem.Text = "Paste Above";
-            this.PasteAboveStripMenuItem.Click += new System.EventHandler(this.PasteAboveStripMenuItem_Click);
-            // 
-            // PasteBelowStripMenuItem
-            // 
-            this.PasteBelowStripMenuItem.Name = "PasteBelowStripMenuItem";
-            this.PasteBelowStripMenuItem.Size = new System.Drawing.Size(145, 22);
-            this.PasteBelowStripMenuItem.Text = "Paste Below";
-            this.PasteBelowStripMenuItem.Click += new System.EventHandler(this.PasteBelowStripMenuItem_Click);
-            // 
-            // GenerateSQLStripMenuItem
-            // 
-            this.GenerateSQLStripMenuItem.Name = "GenerateSQLStripMenuItem";
-            this.GenerateSQLStripMenuItem.Size = new System.Drawing.Size(145, 22);
-            this.GenerateSQLStripMenuItem.Text = "Generate SQL";
-            this.GenerateSQLStripMenuItem.Click += new System.EventHandler(this.GenerateSQLStripMenuItem_Click);
             // 
             // groupBox2
             // 
@@ -375,6 +460,7 @@ namespace WaypointCreatorGen2
             // 
             // EditorToolStrip
             // 
+            this.EditorToolStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.EditorToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.EditorImportSniffButton,
             this.toolStripSeparator1,
@@ -384,7 +470,7 @@ namespace WaypointCreatorGen2
             this.EditorLoadingLabel});
             this.EditorToolStrip.Location = new System.Drawing.Point(3, 3);
             this.EditorToolStrip.Name = "EditorToolStrip";
-            this.EditorToolStrip.Size = new System.Drawing.Size(1296, 25);
+            this.EditorToolStrip.Size = new System.Drawing.Size(1296, 34);
             this.EditorToolStrip.TabIndex = 0;
             this.EditorToolStrip.Text = "toolStrip1";
             // 
@@ -393,7 +479,7 @@ namespace WaypointCreatorGen2
             this.EditorImportSniffButton.Image = global::WaypointCreatorGen2.Properties.Resources.PIC_Import;
             this.EditorImportSniffButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.EditorImportSniffButton.Name = "EditorImportSniffButton";
-            this.EditorImportSniffButton.Size = new System.Drawing.Size(128, 22);
+            this.EditorImportSniffButton.Size = new System.Drawing.Size(193, 29);
             this.EditorImportSniffButton.Text = "Import Parsed Sniff";
             this.EditorImportSniffButton.ToolTipText = "Loads a parsed sniff .txt file and generates waypoint data from it. You can obtai" +
     "n such .txt files by parsing .pkt sniff files with the WoW Packet Parser of Trin" +
@@ -403,7 +489,7 @@ namespace WaypointCreatorGen2
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 34);
             // 
             // EditorFilterEntryTextBox
             // 
@@ -412,7 +498,7 @@ namespace WaypointCreatorGen2
             this.EditorFilterEntryTextBox.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.EditorFilterEntryTextBox.Name = "EditorFilterEntryTextBox";
             this.EditorFilterEntryTextBox.Overflow = System.Windows.Forms.ToolStripItemOverflow.Never;
-            this.EditorFilterEntryTextBox.Size = new System.Drawing.Size(100, 25);
+            this.EditorFilterEntryTextBox.Size = new System.Drawing.Size(100, 34);
             // 
             // EditorFilterEntryButton
             // 
@@ -420,7 +506,7 @@ namespace WaypointCreatorGen2
             this.EditorFilterEntryButton.Image = global::WaypointCreatorGen2.Properties.Resources.PIC_Search;
             this.EditorFilterEntryButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.EditorFilterEntryButton.Name = "EditorFilterEntryButton";
-            this.EditorFilterEntryButton.Size = new System.Drawing.Size(91, 22);
+            this.EditorFilterEntryButton.Size = new System.Drawing.Size(135, 29);
             this.EditorFilterEntryButton.Text = "Filter Entries";
             this.EditorFilterEntryButton.ToolTipText = "Filters the listed GUID values by CreatureID. If no or an invalid value is specif" +
     "ied it will list all entries.";
@@ -430,12 +516,12 @@ namespace WaypointCreatorGen2
             // 
             this.toolStripSeparator2.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 34);
             // 
             // EditorLoadingLabel
             // 
             this.EditorLoadingLabel.Name = "EditorLoadingLabel";
-            this.EditorLoadingLabel.Size = new System.Drawing.Size(110, 22);
+            this.EditorLoadingLabel.Size = new System.Drawing.Size(167, 29);
             this.EditorLoadingLabel.Text = "No sniff file loaded.";
             // 
             // tabPage2
@@ -462,11 +548,12 @@ namespace WaypointCreatorGen2
             // 
             // SQLOutputToolStrip
             // 
+            this.SQLOutputToolStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.SQLOutputToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.SQLOutputSaveButton});
             this.SQLOutputToolStrip.Location = new System.Drawing.Point(3, 3);
             this.SQLOutputToolStrip.Name = "SQLOutputToolStrip";
-            this.SQLOutputToolStrip.Size = new System.Drawing.Size(1296, 25);
+            this.SQLOutputToolStrip.Size = new System.Drawing.Size(1296, 34);
             this.SQLOutputToolStrip.TabIndex = 0;
             this.SQLOutputToolStrip.Text = "toolStrip1";
             // 
@@ -475,79 +562,19 @@ namespace WaypointCreatorGen2
             this.SQLOutputSaveButton.Image = global::WaypointCreatorGen2.Properties.Resources.PIC_Write;
             this.SQLOutputSaveButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.SQLOutputSaveButton.Name = "SQLOutputSaveButton";
-            this.SQLOutputSaveButton.Size = new System.Drawing.Size(110, 22);
+            this.SQLOutputSaveButton.Size = new System.Drawing.Size(167, 29);
             this.SQLOutputSaveButton.Text = "Save as SQL File";
             this.SQLOutputSaveButton.Click += new System.EventHandler(this.SQLOutputSaveButton_Click);
             // 
-            // SplineGridView
+            // RemoveDuplicatesButton
             // 
-            this.SplineGridView.AllowUserToAddRows = false;
-            this.SplineGridView.AllowUserToDeleteRows = false;
-            this.SplineGridView.AllowUserToResizeColumns = false;
-            this.SplineGridView.AllowUserToResizeRows = false;
-            this.SplineGridView.BackgroundColor = System.Drawing.SystemColors.ButtonFace;
-            this.SplineGridView.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
-            this.SplineGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.SplineGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.SplineGridViewTextBoxColumn1,
-            this.SplineGridViewTextBoxColumn2,
-            this.SplineGridViewTextBoxColumn3,
-            this.SplineGridViewTextBoxColumn4,
-            this.SplineGridViewTextBoxColumn5});
-            this.SplineGridView.ContextMenuStrip = this.GridViewContextMenuStrip;
-            this.SplineGridView.Location = new System.Drawing.Point(7, 250);
-            this.SplineGridView.Name = "SplineGridView";
-            this.SplineGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            this.SplineGridView.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.SplineGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.SplineGridView.Size = new System.Drawing.Size(553, 236);
-            this.SplineGridView.TabIndex = 1;
-            // 
-            // SplineGridViewTextBoxColumn1
-            // 
-            this.SplineGridViewTextBoxColumn1.HeaderText = "PointID";
-            this.SplineGridViewTextBoxColumn1.Name = "SplineGridViewTextBoxColumn1";
-            this.SplineGridViewTextBoxColumn1.ReadOnly = true;
-            this.SplineGridViewTextBoxColumn1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Programmatic;
-            this.SplineGridViewTextBoxColumn1.Width = 50;
-            // 
-            // SplineGridViewTextBoxColumn2
-            // 
-            this.SplineGridViewTextBoxColumn2.HeaderText = "SplinePointIndex";
-            this.SplineGridViewTextBoxColumn2.Name = "SplineGridViewTextBoxColumn2";
-            this.SplineGridViewTextBoxColumn2.ReadOnly = true;
-            this.SplineGridViewTextBoxColumn2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Programmatic;
-            this.SplineGridViewTextBoxColumn2.Width = 100;
-            // 
-            // SplineGridViewTextBoxColumn3
-            // 
-            dataGridViewCellStyle1.NullValue = "0.0";
-            this.SplineGridViewTextBoxColumn3.DefaultCellStyle = dataGridViewCellStyle1;
-            this.SplineGridViewTextBoxColumn3.HeaderText = "PositionX";
-            this.SplineGridViewTextBoxColumn3.Name = "SplineGridViewTextBoxColumn3";
-            this.SplineGridViewTextBoxColumn3.ReadOnly = true;
-            this.SplineGridViewTextBoxColumn3.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.SplineGridViewTextBoxColumn3.Width = 80;
-            // 
-            // SplineGridViewTextBoxColumn4
-            // 
-            dataGridViewCellStyle2.NullValue = null;
-            this.SplineGridViewTextBoxColumn4.DefaultCellStyle = dataGridViewCellStyle2;
-            this.SplineGridViewTextBoxColumn4.HeaderText = "PositionY";
-            this.SplineGridViewTextBoxColumn4.Name = "SplineGridViewTextBoxColumn4";
-            this.SplineGridViewTextBoxColumn4.ReadOnly = true;
-            this.SplineGridViewTextBoxColumn4.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.SplineGridViewTextBoxColumn4.Width = 80;
-            // 
-            // SplineGridViewTextBoxColumn5
-            // 
-            dataGridViewCellStyle3.NullValue = null;
-            this.SplineGridViewTextBoxColumn5.DefaultCellStyle = dataGridViewCellStyle3;
-            this.SplineGridViewTextBoxColumn5.HeaderText = "PositionZ";
-            this.SplineGridViewTextBoxColumn5.Name = "SplineGridViewTextBoxColumn5";
-            this.SplineGridViewTextBoxColumn5.ReadOnly = true;
-            this.SplineGridViewTextBoxColumn5.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.SplineGridViewTextBoxColumn5.Width = 80;
+            this.RemoveDuplicatesButton.Location = new System.Drawing.Point(442, 256);
+            this.RemoveDuplicatesButton.Name = "RemoveDuplicatesButton";
+            this.RemoveDuplicatesButton.Size = new System.Drawing.Size(118, 24);
+            this.RemoveDuplicatesButton.TabIndex = 2;
+            this.RemoveDuplicatesButton.Text = "Remove Duplicates";
+            this.RemoveDuplicatesButton.UseVisualStyleBackColor = true;
+            this.RemoveDuplicatesButton.Click += new System.EventHandler(this.RemoveDuplicatesButton_Click);
             // 
             // WaypointCreator
             // 
@@ -563,8 +590,9 @@ namespace WaypointCreatorGen2
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
             this.groupBox3.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.EditorGridView)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.SplineGridView)).EndInit();
             this.GridViewContextMenuStrip.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.EditorGridView)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.EditorWaypointChart)).EndInit();
@@ -574,7 +602,6 @@ namespace WaypointCreatorGen2
             this.tabPage2.PerformLayout();
             this.SQLOutputToolStrip.ResumeLayout(false);
             this.SQLOutputToolStrip.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.SplineGridView)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -619,6 +646,7 @@ namespace WaypointCreatorGen2
         private System.Windows.Forms.DataGridViewTextBoxColumn SplineGridViewTextBoxColumn3;
         private System.Windows.Forms.DataGridViewTextBoxColumn SplineGridViewTextBoxColumn4;
         private System.Windows.Forms.DataGridViewTextBoxColumn SplineGridViewTextBoxColumn5;
+        private System.Windows.Forms.Button RemoveDuplicatesButton;
     }
 }
 
