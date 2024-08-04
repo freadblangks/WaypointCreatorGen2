@@ -65,17 +65,24 @@ namespace WaypointCreatorGen2
             CreatureNamesByEntry.Clear();
             Dictionary<UInt32, Dictionary<UInt64, List<WaypointInfo>>> result = new Dictionary<UInt32, Dictionary<UInt64, List<WaypointInfo>>>();
 
+            var SplineFlagsRegEx = new Regex(@"^\[[0-9]+\]\sSplineFlags: ([0-9]+)");
+
             using (System.IO.StreamReader file = new System.IO.StreamReader(filePath))
             {
                 string line;
                 while ((line = file.ReadLine()) != null)
                 {
-                    if (line.Contains("SMSG_ON_MONSTER_MOVE") || line.Contains("SMSG_ON_MONSTER_MOVE_TRANSPORT"))
+                    if (line.Contains("SMSG_ON_MONSTER_MOVE") || line.Contains("SMSG_ON_MONSTER_MOVE_TRANSPORT") || line.Contains("SMSG_UPDATE_OBJECT"))
                     {
                         WaypointInfo wpInfo = new WaypointInfo();
                         UInt32 creatureId = 0;
                         UInt64 lowGuid = 0;
                         string creatureName = "Unknown";
+                        bool isUpdateObject = line.Contains("SMSG_UPDATE_OBJECT");
+                        uint moverCount = 0;
+
+                        if (isUpdateObject)
+                            wpInfo.Comment += "UpdateObject ";
 
                         // Extracting the packet timestamp in milliseconds from the packet header for delay calculations
                         string[] packetHeader = line.Split(new char[] { ' ' });
@@ -117,6 +124,15 @@ namespace WaypointCreatorGen2
 
                                 if (match.Success)
                                     creatureName = match.Groups[1].Value;
+
+                                moverCount++;
+                            }
+
+                            if (line.Contains("SplineFlags:"))
+                            {
+                                var match = SplineFlagsRegEx.Match(line);
+                                if (match.Success)
+                                    wpInfo.SplineFlags = UInt32.Parse(match.Groups[1].Value);
                             }
 
                             // Extracting spline duration
@@ -152,17 +168,27 @@ namespace WaypointCreatorGen2
                                 }
 
                                 // Delay Calculation
-                                if (result.ContainsKey(creatureId) && result[creatureId].ContainsKey(lowGuid))
+                                if (!isUpdateObject)
                                 {
-                                    if (result[creatureId][lowGuid].Count != 0)
+                                    if (result.ContainsKey(creatureId) && result[creatureId].ContainsKey(lowGuid))
                                     {
-                                        int index = result[creatureId][lowGuid].Count - 1;
-                                        Int64 timeDiff = wpInfo.TimeStamp - result[creatureId][lowGuid][index].TimeStamp;
-                                        UInt32 oldMoveTime = result[creatureId][lowGuid][index].MoveTime;
-                                        int delay = Convert.ToInt32(timeDiff - oldMoveTime);
-                                        if (delay < 0)
-                                            delay = 0;
-                                        result[creatureId][lowGuid][index].Delay = delay;
+                                        if (result[creatureId][lowGuid].Count != 0)
+                                        {
+                                            int index = result[creatureId][lowGuid].Count - 1;
+                                            Int64 timeDiff = wpInfo.TimeStamp - result[creatureId][lowGuid][index].TimeStamp;
+                                            UInt32 oldMoveTime = result[creatureId][lowGuid][index].MoveTime;
+                                            try
+                                            {
+                                                int delay = Convert.ToInt32(timeDiff - oldMoveTime);
+                                                if (delay < 0)
+                                                    delay = 0;
+                                                result[creatureId][lowGuid][index].Delay = delay;
+                                            }
+                                            catch (OverflowException)
+                                            {
+                                                continue;
+                                            }
+                                        }
                                     }
                                 }
 
@@ -176,7 +202,7 @@ namespace WaypointCreatorGen2
                                 if (!result[creatureId].ContainsKey(lowGuid))
                                     result[creatureId].Add(lowGuid, new List<WaypointInfo>());
 
-                                result[creatureId][lowGuid].Add(wpInfo);
+                                result[creatureId][lowGuid].Add(new WaypointInfo(wpInfo));
                             }
 
                             if (line.Contains(" WayPoints:"))
@@ -201,6 +227,22 @@ namespace WaypointCreatorGen2
                 }
             }
 
+            foreach (var creatureIdRow in result)
+            {
+                foreach (var guidRow in creatureIdRow.Value)
+                {
+                    List<WaypointInfo> rowsToDelete = new List<WaypointInfo>();
+                    WaypointInfo row = guidRow.Value[0];
+
+                    if (row.IsCyclic())
+                    {
+                        guidRow.Value.RemoveRange(0, 2);
+                        int deleteNum = row.IsEnterCycle() ? 2 : 1;
+                        guidRow.Value.RemoveRange(guidRow.Value.Count - deleteNum, deleteNum);
+                    }
+                }
+            }
+
             return result;
         }
 
@@ -214,7 +256,14 @@ namespace WaypointCreatorGen2
                 {
                     CreatureNamesByEntry.TryGetValue(waypointsByEntry.Key, out var name);
                     foreach (var waypointsByGuid in waypointsByEntry.Value)
-                        EditorListBox.Items.Add($"{waypointsByEntry.Key} - {name} ({waypointsByGuid.Key})");
+                    {
+                        string cyclic = "";
+                        if (waypointsByGuid.Value[0].IsCyclic()) // Cyclic
+                            cyclic += "Cyclic ";
+                        if (waypointsByGuid.Value[0].IsEnterCycle()) // EnterCycle
+                            cyclic += "Enter Cycle ";
+                        EditorListBox.Items.Add($"{waypointsByEntry.Key} - {name} ({waypointsByGuid.Key}){cyclic}");
+                    }
                 }
 
             }
@@ -224,9 +273,15 @@ namespace WaypointCreatorGen2
                 {
                     CreatureNamesByEntry.TryGetValue(creatureId, out var name);
                     foreach (var waypointsByGuid in WaypointDatabyCreatureEntry[creatureId])
-                        EditorListBox.Items.Add($"{creatureId} - {name} ({waypointsByGuid.Key.ToString()})");
+                    {
+                        string cyclic = "";
+                        if (waypointsByGuid.Value[0].IsCyclic()) // Cyclic
+                            cyclic += "Cyclic ";
+                        if (waypointsByGuid.Value[0].IsEnterCycle()) // EnterCycle
+                            cyclic += "Enter Cycle ";
+                        EditorListBox.Items.Add($"{creatureId} - {name} ({waypointsByGuid.Key}){cyclic}");
+                    }
                 }
-
             }
         }
 
@@ -580,6 +635,24 @@ namespace WaypointCreatorGen2
         public UInt32 MoveTime = 0;
         public Int32 Delay = 0;
         public List<SplinePosition> SplineList = new List<SplinePosition>();
+        public string Comment = "";
+        public uint SplineFlags = 0;
+
+        public WaypointInfo() { }
+
+        public WaypointInfo(WaypointInfo rhs)
+        {
+            TimeStamp = rhs.TimeStamp;
+            Position = new WaypointPosition(rhs.Position);
+            MoveTime = rhs.MoveTime;
+            Delay = rhs.Delay;
+            SplineList = rhs.SplineList;
+            Comment = rhs.Comment;
+            SplineFlags = rhs.SplineFlags;
+        }
+
+        public bool IsCyclic() { return (SplineFlags & 0x00001000) != 0; }
+        public bool IsEnterCycle() { return (SplineFlags & 0x00002000) != 0; }
     }
 
     public class WaypointPosition
@@ -589,6 +662,15 @@ namespace WaypointCreatorGen2
         public float PositionZ = 0f;
         public float? Orientation;
 
+        public WaypointPosition() { }
+
+        public WaypointPosition(WaypointPosition rhs)
+        {
+            PositionX = rhs.PositionX;
+            PositionY = rhs.PositionY;
+            PositionZ = rhs.PositionZ;
+            Orientation = rhs.Orientation;
+        }
         public override bool Equals(object obj)
         {
             if (obj == null || GetType() != obj.GetType())
