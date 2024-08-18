@@ -140,7 +140,7 @@ namespace WaypointCreatorGen2
                             {
                                 string[] words = line.Split(new char[] { ' ' });
                                 for (int i = 0; i < words.Length; ++i)
-                                    if (words[i].Contains("MoveTime:"))
+                                    if (words[i].Contains("MoveTime:") && !words[i].Contains("Has"))
                                         wpInfo.MoveTime = UInt32.Parse(words[i + 1]);
                             }
 
