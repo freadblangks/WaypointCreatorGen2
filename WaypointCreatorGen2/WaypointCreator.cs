@@ -177,17 +177,13 @@ namespace WaypointCreatorGen2
                                             int index = result[creatureId][lowGuid].Count - 1;
                                             Int64 timeDiff = wpInfo.TimeStamp - result[creatureId][lowGuid][index].TimeStamp;
                                             UInt32 oldMoveTime = result[creatureId][lowGuid][index].MoveTime;
-                                            try
-                                            {
-                                                int delay = Convert.ToInt32(timeDiff - oldMoveTime);
-                                                if (delay < 0)
-                                                    delay = 0;
-                                                result[creatureId][lowGuid][index].Delay = delay;
-                                            }
-                                            catch (OverflowException)
-                                            {
-                                                continue;
-                                            }
+                                            int delay = 0;
+                                            if (oldMoveTime < 3 * 60 * 1000) // 3min, arbitrary number as MoveTime in UpdateObject might have high values causing overflows
+                                                delay = Convert.ToInt32(timeDiff - oldMoveTime);
+
+                                            if (delay < 0)
+                                                delay = 0;
+                                            result[creatureId][lowGuid][index].Delay = delay;
                                         }
                                     }
                                 }
