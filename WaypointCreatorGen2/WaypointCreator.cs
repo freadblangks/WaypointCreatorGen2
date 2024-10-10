@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Numerics;
 
 namespace WaypointCreatorGen2
 {
@@ -153,6 +154,13 @@ namespace WaypointCreatorGen2
                                     if (words[i].Contains("MoveTime:") && !words[i].Contains("Has"))
                                         wpInfo.MoveTime = UInt32.Parse(words[i + 1]);
                             }
+                            else if (line.Contains("Duration:"))
+                            {
+                                string[] words = line.Split(new char[] { ' ' });
+                                for (int i = 0; i < words.Length; ++i)
+                                    if (words[i].Contains("Duration:"))
+                                        wpInfo.MoveTime = UInt32.Parse(words[i + 1]);
+                            }
 
                             // Extract Facing Angles
                             if (line.Contains("FaceDirection:"))
@@ -242,9 +250,12 @@ namespace WaypointCreatorGen2
 
                     if (row.IsCyclic())
                     {
-                        guidRow.Value.RemoveRange(0, 2);
+                        for (var i = 0; i < 2; i++)
+                            guidRow.Value[i].Hidden = true;
+
                         int deleteNum = row.IsEnterCycle() ? 2 : 1;
-                        guidRow.Value.RemoveRange(guidRow.Value.Count - deleteNum, deleteNum);
+                        for (var i = guidRow.Value.Count - deleteNum; i < guidRow.Value.Count; i++)
+                            guidRow.Value[i].Hidden = true;
                     }
                 }
             }
@@ -311,6 +322,9 @@ namespace WaypointCreatorGen2
                 int count = 0;
                 foreach (WaypointInfo wpInfo in WaypointDatabyCreatureEntry[creatureId][lowGUID])
                 {
+                    if (wpInfo.Hidden)
+                        continue;
+
                     int splineCount = 0;
                     string orientation = "NULL";
                     if (wpInfo.Position.Orientation.HasValue)
@@ -480,6 +494,52 @@ namespace WaypointCreatorGen2
             BuildGraphPath();
         }
 
+        public static float CatmullRomSplineInterpolation(float P0, float P1, float P2, float P3, float t)
+        {
+            return 0.5f * (2 * P1 +
+                            (-P0 + P2) * t +
+                            (2 * P0 - 5 * P1 + 4 * P2 - P3) * t * t +
+                            (-P0 + 3 * P1 - 3 * P2 + P3) * t * t * t);
+        }
+
+        public static List<Vector3> CatmullRomSpline(WaypointPosition P0, WaypointPosition P1, WaypointPosition P2, WaypointPosition P3, int numPoints)
+        {
+            List<Vector3> points = new List<Vector3>();
+            for (int i = 0; i <= numPoints; i++)
+            {
+                float t = (float)i / numPoints;
+
+                float x = CatmullRomSplineInterpolation(P0.PositionX, P1.PositionX, P2.PositionX, P3.PositionX, t);
+                float y = CatmullRomSplineInterpolation(P0.PositionY, P1.PositionY, P2.PositionY, P3.PositionY, t);
+                float z = CatmullRomSplineInterpolation(P0.PositionZ, P1.PositionZ, P2.PositionZ, P3.PositionZ, t);
+
+                points.Add(new Vector3(x, y, z));
+            }
+            return points;
+        }
+
+        public static float CalculateCatmullromSplineSpeed(uint moveTimeMs, List<WaypointPosition> points)
+        {
+            int numSamplePoints = 10;
+            List<Vector3> allSplinePoints = new List<Vector3>();
+
+            for (int i = 1; i < points.Count - 2; i++)
+            {
+                var segmentPoints = CatmullRomSpline(points[i - 1], points[i], points[i + 1], points[i + 2], numSamplePoints);
+                allSplinePoints.AddRange(segmentPoints);
+            }
+
+            float totalDistanceSpline = 0;
+            for (int i = 0; i < allSplinePoints.Count - 1; i++)
+            {
+                totalDistanceSpline += Vector3.Distance(allSplinePoints[i], allSplinePoints[i + 1]);
+            }
+
+            float moveTimeSec = (float)moveTimeMs / 1000;
+
+            return totalDistanceSpline / moveTimeSec;
+        }
+
         private void GenerateSQLStripMenuItem_Click(object sender, EventArgs e)
         {
             // Generates the SQL output.
@@ -492,6 +552,17 @@ namespace WaypointCreatorGen2
             {
                 if (SelectedRow.FirstInfo.IsCyclic())
                     flags = 0x2;
+
+                if (SelectedRow.FirstInfo.IsCatmullrom())
+                {
+                    List<WaypointPosition> points = new List<WaypointPosition>();
+                    var wpList = WaypointDatabyCreatureEntry[SelectedRow.CreatureID][SelectedRow.LowGUID];
+                    foreach (var wp in wpList)
+                    {
+                        points.Add(wp.Position);
+                    }
+                    velocity = CalculateCatmullromSplineSpeed(SelectedRow.FirstInfo.MoveTime, points).ToString("F4", CultureInfo.InvariantCulture);
+                }
             }
 
             SQLOutputTextBox.AppendText("SET @MOVERGUID := @CGUID+xxxxxxxx;\r\n");
@@ -652,6 +723,7 @@ namespace WaypointCreatorGen2
         public List<SplinePosition> SplineList = new List<SplinePosition>();
         public string Comment = "";
         public uint SplineFlags = 0;
+        public bool Hidden = false;
 
         public WaypointInfo() { }
 
@@ -666,6 +738,7 @@ namespace WaypointCreatorGen2
             SplineFlags = rhs.SplineFlags;
         }
 
+        public bool IsCatmullrom() { return (SplineFlags & 0x00000800) != 0; }
         public bool IsCyclic() { return (SplineFlags & 0x00001000) != 0; }
         public bool IsEnterCycle() { return (SplineFlags & 0x00002000) != 0; }
     }
