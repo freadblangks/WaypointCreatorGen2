@@ -9,6 +9,12 @@ using System.Windows.Forms;
 
 namespace WaypointCreatorGen2
 {
+    public class SelectedRowData
+    {
+        public uint CreatureID;
+        public ulong LowGUID;
+    }
+
     public partial class WaypointCreator : Form
     {
         // Dictionary<UInt32 /*CreatureID*/, Dictionary<UInt64 /*lowGUID*/, List<WaypointInfo>>>
@@ -16,9 +22,11 @@ namespace WaypointCreatorGen2
         Dictionary<UInt32, string> CreatureNamesByEntry = new Dictionary<uint, string>();
 
         DataGridViewRow[] CopiedDataGridRows;
-        private (uint, ulong) SelectedRow = (0, 0);
-        private uint _selectedCreatureId = 0;
-
+        private SelectedRowData SelectedRow = new()
+        {
+            CreatureID = 0,
+            LowGUID = 0,
+        };
         private const int SEQUENCE_TO_CHECK_FOR_DUPLICATES = 3;
 
         public WaypointCreator()
@@ -290,11 +298,12 @@ namespace WaypointCreatorGen2
             if (!WaypointDatabyCreatureEntry.ContainsKey(creatureId))
                 return;
 
-            _selectedCreatureId = creatureId;
+            SelectedRow.CreatureID = creatureId;
 
             if (WaypointDatabyCreatureEntry[creatureId].ContainsKey(lowGUID))
             {
-                SelectedRow = (creatureId, lowGUID);
+                SelectedRow.CreatureID = creatureId;
+                SelectedRow.LowGUID = lowGUID;
 
                 int count = 0;
                 foreach (WaypointInfo wpInfo in WaypointDatabyCreatureEntry[creatureId][lowGUID])
@@ -472,11 +481,11 @@ namespace WaypointCreatorGen2
         {
             // Generates the SQL output.
             // waypoint_data
-            CreatureNamesByEntry.TryGetValue(_selectedCreatureId, out string name);
+            CreatureNamesByEntry.TryGetValue(SelectedRow.CreatureID, out string name);
             var velocity = "NULL";
 
             SQLOutputTextBox.AppendText("SET @MOVERGUID := @CGUID+xxxxxxxx;\r\n");
-            SQLOutputTextBox.AppendText($"SET @ENTRY := {_selectedCreatureId};\r\n");
+            SQLOutputTextBox.AppendText($"SET @ENTRY := {SelectedRow.CreatureID};\r\n");
             SQLOutputTextBox.AppendText("SET @PATHOFFSET := 0;\r\n");
             SQLOutputTextBox.AppendText("SET @PATH := @ENTRY * 100 + @PATHOFFSET;\r\n");
             SQLOutputTextBox.AppendText("DELETE FROM `waypoint_path` WHERE `PathId`= @PATH;\r\n");
@@ -599,7 +608,7 @@ namespace WaypointCreatorGen2
         {
             EditorGridView.Rows.Clear();
 
-            var wpList = WaypointDatabyCreatureEntry[SelectedRow.Item1][SelectedRow.Item2];
+            var wpList = WaypointDatabyCreatureEntry[SelectedRow.CreatureID][SelectedRow.LowGUID];
 
             var count = 0;
             foreach (var wpInfo in GetDeduplicatedWaypointList(wpList))
