@@ -13,6 +13,7 @@ namespace WaypointCreatorGen2
     {
         public uint CreatureID;
         public ulong LowGUID;
+        public WaypointInfo FirstInfo;
     }
 
     public partial class WaypointCreator : Form
@@ -26,6 +27,7 @@ namespace WaypointCreatorGen2
         {
             CreatureID = 0,
             LowGUID = 0,
+            FirstInfo = null,
         };
         private const int SEQUENCE_TO_CHECK_FOR_DUPLICATES = 3;
 
@@ -304,6 +306,7 @@ namespace WaypointCreatorGen2
             {
                 SelectedRow.CreatureID = creatureId;
                 SelectedRow.LowGUID = lowGUID;
+                SelectedRow.FirstInfo = WaypointDatabyCreatureEntry[creatureId][lowGUID].FirstOrDefault();
 
                 int count = 0;
                 foreach (WaypointInfo wpInfo in WaypointDatabyCreatureEntry[creatureId][lowGUID])
@@ -484,13 +487,20 @@ namespace WaypointCreatorGen2
             CreatureNamesByEntry.TryGetValue(SelectedRow.CreatureID, out string name);
             var velocity = "NULL";
 
+            var flags = 0;
+            if (SelectedRow.FirstInfo != null)
+            {
+                if (SelectedRow.FirstInfo.IsCyclic())
+                    flags = 0x2;
+            }
+
             SQLOutputTextBox.AppendText("SET @MOVERGUID := @CGUID+xxxxxxxx;\r\n");
             SQLOutputTextBox.AppendText($"SET @ENTRY := {SelectedRow.CreatureID};\r\n");
             SQLOutputTextBox.AppendText("SET @PATHOFFSET := 0;\r\n");
             SQLOutputTextBox.AppendText("SET @PATH := @ENTRY * 100 + @PATHOFFSET;\r\n");
             SQLOutputTextBox.AppendText("DELETE FROM `waypoint_path` WHERE `PathId`= @PATH;\r\n");
             SQLOutputTextBox.AppendText("INSERT INTO `waypoint_path` (`PathId`, `MoveType`, `Flags`, `Velocity`, `Comment`) VALUES\r\n");
-            SQLOutputTextBox.AppendText($"(@PATH, 0, 0, {velocity}, '{name} - Idle');\r\n");
+            SQLOutputTextBox.AppendText($"(@PATH, 0, 0x{flags:x}, {velocity}, '{name} - Idle');\r\n");
             SQLOutputTextBox.AppendText("\r\n");
 
             SQLOutputTextBox.AppendText("DELETE FROM `waypoint_path_node` WHERE `PathId`= @PATH;\r\n");
