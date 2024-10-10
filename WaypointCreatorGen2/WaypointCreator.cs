@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Numerics;
+using WaypointCreatorGen2.Enums;
 
 namespace WaypointCreatorGen2
 {
@@ -143,7 +144,7 @@ namespace WaypointCreatorGen2
                             {
                                 var match = SplineFlagsRegEx.Match(line);
                                 if (match.Success)
-                                    wpInfo.SplineFlags = UInt32.Parse(match.Groups[1].Value);
+                                    wpInfo.SplineFlags = (MoveSplineFlag)Enum.Parse(typeof(MoveSplineFlag), match.Groups[1].Value);
                             }
 
                             // Extracting spline duration
@@ -545,8 +546,9 @@ namespace WaypointCreatorGen2
             // Generates the SQL output.
             // waypoint_data
             CreatureNamesByEntry.TryGetValue(SelectedRow.CreatureID, out string name);
-            var velocity = "NULL";
 
+            var velocity = "NULL";
+            var moveType = WaypointMoveType.Walk;
             var flags = 0;
             if (SelectedRow.FirstInfo != null)
             {
@@ -571,7 +573,7 @@ namespace WaypointCreatorGen2
             SQLOutputTextBox.AppendText("SET @PATH := @ENTRY * 100 + @PATHOFFSET;\r\n");
             SQLOutputTextBox.AppendText("DELETE FROM `waypoint_path` WHERE `PathId`= @PATH;\r\n");
             SQLOutputTextBox.AppendText("INSERT INTO `waypoint_path` (`PathId`, `MoveType`, `Flags`, `Velocity`, `Comment`) VALUES\r\n");
-            SQLOutputTextBox.AppendText($"(@PATH, 0, 0x{flags:x}, {velocity}, '{name} - Idle');\r\n");
+            SQLOutputTextBox.AppendText($"(@PATH, {(int)moveType}, 0x{flags:x}, {velocity}, '{name} - Idle');\r\n");
             SQLOutputTextBox.AppendText("\r\n");
 
             SQLOutputTextBox.AppendText("DELETE FROM `waypoint_path_node` WHERE `PathId`= @PATH;\r\n");
@@ -722,7 +724,7 @@ namespace WaypointCreatorGen2
         public Int32 Delay = 0;
         public List<SplinePosition> SplineList = new List<SplinePosition>();
         public string Comment = "";
-        public uint SplineFlags = 0;
+        public MoveSplineFlag SplineFlags = 0;
         public bool Hidden = false;
 
         public WaypointInfo() { }
@@ -738,9 +740,9 @@ namespace WaypointCreatorGen2
             SplineFlags = rhs.SplineFlags;
         }
 
-        public bool IsCatmullrom() { return (SplineFlags & 0x00000800) != 0; }
-        public bool IsCyclic() { return (SplineFlags & 0x00001000) != 0; }
-        public bool IsEnterCycle() { return (SplineFlags & 0x00002000) != 0; }
+        public bool IsCatmullrom() { return SplineFlags.HasFlag(MoveSplineFlag.Catmullrom); }
+        public bool IsCyclic() { return SplineFlags.HasFlag(MoveSplineFlag.Cyclic); }
+        public bool IsEnterCycle() { return SplineFlags.HasFlag(MoveSplineFlag.Enter_Cycle); }
     }
 
     public class WaypointPosition
