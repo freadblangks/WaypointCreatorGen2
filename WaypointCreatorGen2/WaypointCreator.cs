@@ -11,13 +11,6 @@ using WaypointCreatorGen2.Enums;
 
 namespace WaypointCreatorGen2
 {
-    public class SelectedRowData
-    {
-        public uint CreatureID;
-        public ulong LowGUID;
-        public WaypointInfo FirstInfo;
-    }
-
     public partial class WaypointCreator : Form
     {
         // Dictionary<UInt32 /*CreatureID*/, Dictionary<UInt64 /*lowGUID*/, List<WaypointInfo>>>
@@ -223,15 +216,15 @@ namespace WaypointCreatorGen2
                             if (line.Contains(" WayPoints:"))
                             {
                                 string[] words = line.Split(new char[] { ' ' });
-                                SplinePosition splinePosition = new SplinePosition();
+                                Vector3 splinePosition = new Vector3();
                                 for (int i = 0; i < words.Length; ++i)
                                 {
                                     if (words[i].Contains("X:"))
-                                        splinePosition.PositionX = float.Parse(words[i + 1], CultureInfo.InvariantCulture);
+                                        splinePosition.X = float.Parse(words[i + 1], CultureInfo.InvariantCulture);
                                     else if (words[i].Contains("Y:"))
-                                        splinePosition.PositionY = float.Parse(words[i + 1], CultureInfo.InvariantCulture);
+                                        splinePosition.Y = float.Parse(words[i + 1], CultureInfo.InvariantCulture);
                                     else if (words[i].Contains("Z:"))
-                                        splinePosition.PositionZ = float.Parse(words[i + 1], CultureInfo.InvariantCulture);
+                                        splinePosition.Z = float.Parse(words[i + 1], CultureInfo.InvariantCulture);
                                 }
 
                                 wpInfo.SplineList.Add(splinePosition);
@@ -340,14 +333,14 @@ namespace WaypointCreatorGen2
                         wpInfo.MoveTime,
                         wpInfo.Delay);
 
-                    foreach (SplinePosition splineInfo in wpInfo.SplineList)
+                    foreach (Vector3 splineInfo in wpInfo.SplineList)
                     {
                         SplineGridView.Rows.Add(
                             count,
                             splineCount,
-                            splineInfo.PositionX.ToString(CultureInfo.InvariantCulture),
-                            splineInfo.PositionY.ToString(CultureInfo.InvariantCulture),
-                            splineInfo.PositionZ.ToString(CultureInfo.InvariantCulture));
+                            splineInfo.X.ToString(CultureInfo.InvariantCulture),
+                            splineInfo.Y.ToString(CultureInfo.InvariantCulture),
+                            splineInfo.Z.ToString(CultureInfo.InvariantCulture));
 
                         ++splineCount;
                     }
@@ -715,89 +708,4 @@ namespace WaypointCreatorGen2
             BuildGraphPath();
         }
     }
-
-    public class WaypointInfo
-    {
-        public UInt32 TimeStamp = 0;
-        public WaypointPosition Position = new WaypointPosition();
-        public UInt32 MoveTime = 0;
-        public Int32 Delay = 0;
-        public List<SplinePosition> SplineList = new List<SplinePosition>();
-        public string Comment = "";
-        public MoveSplineFlag SplineFlags = 0;
-        public bool Hidden = false;
-
-        public WaypointInfo() { }
-
-        public WaypointInfo(WaypointInfo rhs)
-        {
-            TimeStamp = rhs.TimeStamp;
-            Position = new WaypointPosition(rhs.Position);
-            MoveTime = rhs.MoveTime;
-            Delay = rhs.Delay;
-            SplineList = rhs.SplineList;
-            Comment = rhs.Comment;
-            SplineFlags = rhs.SplineFlags;
-        }
-
-        public bool IsCatmullrom() { return SplineFlags.HasFlag(MoveSplineFlag.Catmullrom); }
-        public bool IsCyclic() { return SplineFlags.HasFlag(MoveSplineFlag.Cyclic); }
-        public bool IsEnterCycle() { return SplineFlags.HasFlag(MoveSplineFlag.Enter_Cycle); }
-    }
-
-    public class WaypointPosition
-    {
-        public float PositionX = 0f;
-        public float PositionY = 0f;
-        public float PositionZ = 0f;
-        public float? Orientation;
-
-        public WaypointPosition() { }
-
-        public WaypointPosition(WaypointPosition rhs)
-        {
-            PositionX = rhs.PositionX;
-            PositionY = rhs.PositionY;
-            PositionZ = rhs.PositionZ;
-            Orientation = rhs.Orientation;
-        }
-        public override bool Equals(object obj)
-        {
-            if (obj == null || GetType() != obj.GetType())
-                return false;
-
-            WaypointPosition otherPosition = (WaypointPosition)obj;
-            return PositionX == otherPosition.PositionX &&
-                   PositionY == otherPosition.PositionY &&
-                   PositionZ == otherPosition.PositionZ;
-        }
-
-        public override int GetHashCode()
-        {
-            int hash = 17;
-            hash = hash * 23 + PositionX.GetHashCode();
-            hash = hash * 23 + PositionY.GetHashCode();
-            hash = hash * 23 + PositionZ.GetHashCode();
-            return hash;
-        }
-
-        public float GetEuclideanDistance(WaypointPosition pos)
-        {
-            float deltaX = PositionX - pos.PositionX;
-            float deltaY = PositionY - pos.PositionY;
-            float deltaZ = PositionZ - pos.PositionZ;
-
-            float distanceSquared = deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ;
-
-            return (float)Math.Sqrt(distanceSquared);
-        }
-    }
-
-    public class SplinePosition
-    {
-        public float PositionX = 0f;
-        public float PositionY = 0f;
-        public float PositionZ = 0f;
-    }
-
 }
