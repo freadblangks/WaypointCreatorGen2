@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Numerics;
 using WaypointCreatorGen2.Enums;
+using WaypointCreatorGen2.Spline;
 
 namespace WaypointCreatorGen2
 {
@@ -488,52 +489,6 @@ namespace WaypointCreatorGen2
             BuildGraphPath();
         }
 
-        public static float CatmullRomSplineInterpolation(float P0, float P1, float P2, float P3, float t)
-        {
-            return 0.5f * (2 * P1 +
-                            (-P0 + P2) * t +
-                            (2 * P0 - 5 * P1 + 4 * P2 - P3) * t * t +
-                            (-P0 + 3 * P1 - 3 * P2 + P3) * t * t * t);
-        }
-
-        public static List<Vector3> CatmullRomSpline(WaypointPosition P0, WaypointPosition P1, WaypointPosition P2, WaypointPosition P3, int numPoints)
-        {
-            List<Vector3> points = new List<Vector3>();
-            for (int i = 0; i <= numPoints; i++)
-            {
-                float t = (float)i / numPoints;
-
-                float x = CatmullRomSplineInterpolation(P0.PositionX, P1.PositionX, P2.PositionX, P3.PositionX, t);
-                float y = CatmullRomSplineInterpolation(P0.PositionY, P1.PositionY, P2.PositionY, P3.PositionY, t);
-                float z = CatmullRomSplineInterpolation(P0.PositionZ, P1.PositionZ, P2.PositionZ, P3.PositionZ, t);
-
-                points.Add(new Vector3(x, y, z));
-            }
-            return points;
-        }
-
-        public static float CalculateCatmullromSplineSpeed(uint moveTimeMs, List<WaypointPosition> points)
-        {
-            int numSamplePoints = 10;
-            List<Vector3> allSplinePoints = new List<Vector3>();
-
-            for (int i = 1; i < points.Count - 2; i++)
-            {
-                var segmentPoints = CatmullRomSpline(points[i - 1], points[i], points[i + 1], points[i + 2], numSamplePoints);
-                allSplinePoints.AddRange(segmentPoints);
-            }
-
-            float totalDistanceSpline = 0;
-            for (int i = 0; i < allSplinePoints.Count - 1; i++)
-            {
-                totalDistanceSpline += Vector3.Distance(allSplinePoints[i], allSplinePoints[i + 1]);
-            }
-
-            float moveTimeSec = (float)moveTimeMs / 1000;
-
-            return totalDistanceSpline / moveTimeSec;
-        }
-
         private void GenerateSQLStripMenuItem_Click(object sender, EventArgs e)
         {
             // Generates the SQL output.
@@ -556,7 +511,7 @@ namespace WaypointCreatorGen2
                     {
                         points.Add(wp.Position);
                     }
-                    velocity = CalculateCatmullromSplineSpeed(SelectedRow.FirstInfo.MoveTime, points).ToString("F4", CultureInfo.InvariantCulture);
+                    velocity = CatmullRom.CalculateSpeed(SelectedRow.FirstInfo.MoveTime, points).ToString("F4", CultureInfo.InvariantCulture);
                 }
             }
 
