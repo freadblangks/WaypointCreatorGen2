@@ -505,11 +505,12 @@ namespace WaypointCreatorGen2
 
                 if (SelectedRow.FirstInfo.IsCatmullrom())
                 {
-                    List<WaypointPosition> points = new List<WaypointPosition>();
+                    List<Vector3> points = new List<Vector3>();
                     var wpList = WaypointDatabyCreatureEntry[SelectedRow.CreatureID][SelectedRow.LowGUID];
-                    foreach (var wp in wpList)
+
+                    foreach (DataGridViewRow row in EditorGridView.Rows)
                     {
-                        points.Add(wp.Position);
+                        points.Add(new Vector3(float.Parse((string)row.Cells[1].Value, CultureInfo.InvariantCulture), float.Parse((string)row.Cells[2].Value, CultureInfo.InvariantCulture), float.Parse((string)row.Cells[3].Value, CultureInfo.InvariantCulture)));
                     }
                     velocity = CatmullRom.CalculateSpeed(SelectedRow.FirstInfo.MoveTime, points).ToString("F4", CultureInfo.InvariantCulture);
                 }
