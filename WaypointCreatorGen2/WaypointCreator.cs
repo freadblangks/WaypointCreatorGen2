@@ -325,7 +325,8 @@ namespace WaypointCreatorGen2
                         wpInfo.Position.PositionZ.ToString(CultureInfo.InvariantCulture),
                         orientation,
                         wpInfo.MoveTime,
-                        wpInfo.Delay);
+                        wpInfo.Delay,
+                        count);
 
                     if (IsCyclicVirtualPoint(wpInfo, count, maxCount))
                         EditorGridView.Rows[EditorGridView.Rows.Count - 1].DefaultCellStyle.BackColor = VirtualPointColor;
@@ -457,7 +458,8 @@ namespace WaypointCreatorGen2
                     rowsCopy[appendedIndex].Cells[3].Value,
                     rowsCopy[appendedIndex].Cells[4].Value,
                     rowsCopy[appendedIndex].Cells[5].Value,
-                    rowsCopy[appendedIndex].Cells[6].Value);
+                    rowsCopy[appendedIndex].Cells[6].Value,
+                    rowsCopy[appendedIndex].Cells[7].Value);
 
             // Paste location reached, append copied rows
             foreach (DataGridViewRow row in CopiedDataGridRows)
@@ -468,7 +470,8 @@ namespace WaypointCreatorGen2
                     row.Cells[3].Value,
                     row.Cells[4].Value,
                     row.Cells[5].Value,
-                    row.Cells[6].Value);
+                    row.Cells[6].Value,
+                    row.Cells[7].Value);
 
             // Copied rows added, append remaining points
             for (; appendedIndex < rowsCopy.Length; ++appendedIndex)
@@ -479,7 +482,8 @@ namespace WaypointCreatorGen2
                     rowsCopy[appendedIndex].Cells[3].Value,
                     rowsCopy[appendedIndex].Cells[4].Value,
                     rowsCopy[appendedIndex].Cells[5].Value,
-                    rowsCopy[appendedIndex].Cells[6].Value);
+                    rowsCopy[appendedIndex].Cells[6].Value,
+                    rowsCopy[appendedIndex].Cells[7].Value);
 
             // GridView is updated, rebuild the graph path.
             BuildGraphPath();
@@ -655,7 +659,8 @@ namespace WaypointCreatorGen2
                     wpInfo.Position.PositionZ.ToString(CultureInfo.InvariantCulture),
                     orientation,
                     wpInfo.MoveTime,
-                    wpInfo.Delay);
+                    wpInfo.Delay,
+                    count);
 
                 if (IsCyclicVirtualPoint(wpInfo, count, maxCount))
                     EditorGridView.Rows[EditorGridView.Rows.Count - 1].DefaultCellStyle.BackColor = VirtualPointColor;

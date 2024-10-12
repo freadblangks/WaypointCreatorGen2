@@ -33,14 +33,14 @@ namespace WaypointCreatorGen2
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
             TabControl = new System.Windows.Forms.TabControl();
             tabPage1 = new System.Windows.Forms.TabPage();
             groupBox3 = new System.Windows.Forms.GroupBox();
@@ -58,13 +58,6 @@ namespace WaypointCreatorGen2
             PasteBelowStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             GenerateSQLStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             EditorGridView = new System.Windows.Forms.DataGridView();
-            ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            PositionX = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            PositionY = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            PositionZ = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            Orientation = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            MoveTime = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            Delay = new System.Windows.Forms.DataGridViewTextBoxColumn();
             groupBox2 = new System.Windows.Forms.GroupBox();
             EditorListBox = new System.Windows.Forms.ListBox();
             groupBox1 = new System.Windows.Forms.GroupBox();
@@ -80,6 +73,14 @@ namespace WaypointCreatorGen2
             SQLOutputTextBox = new System.Windows.Forms.TextBox();
             SQLOutputToolStrip = new System.Windows.Forms.ToolStrip();
             SQLOutputSaveButton = new System.Windows.Forms.ToolStripButton();
+            ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            PositionX = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            PositionY = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            PositionZ = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            Orientation = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            MoveTime = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            Delay = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            PointIdx = new System.Windows.Forms.DataGridViewTextBoxColumn();
             TabControl.SuspendLayout();
             tabPage1.SuspendLayout();
             groupBox3.SuspendLayout();
@@ -268,7 +269,7 @@ namespace WaypointCreatorGen2
             EditorGridView.BackgroundColor = System.Drawing.SystemColors.ButtonFace;
             EditorGridView.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
             EditorGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            EditorGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { ID, PositionX, PositionY, PositionZ, Orientation, MoveTime, Delay });
+            EditorGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { ID, PositionX, PositionY, PositionZ, Orientation, MoveTime, Delay, PointIdx });
             EditorGridView.ContextMenuStrip = GridViewContextMenuStrip;
             EditorGridView.Location = new System.Drawing.Point(12, 27);
             EditorGridView.Margin = new System.Windows.Forms.Padding(5, 6, 5, 6);
@@ -280,77 +281,6 @@ namespace WaypointCreatorGen2
             EditorGridView.Size = new System.Drawing.Size(922, 454);
             EditorGridView.TabIndex = 0;
             EditorGridView.RowsRemoved += EditorGridView_RowsRemoved;
-            // 
-            // ID
-            // 
-            ID.HeaderText = "ID";
-            ID.MinimumWidth = 8;
-            ID.Name = "ID";
-            ID.ReadOnly = true;
-            ID.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Programmatic;
-            ID.Width = 50;
-            // 
-            // PositionX
-            // 
-            dataGridViewCellStyle4.NullValue = "0.0";
-            PositionX.DefaultCellStyle = dataGridViewCellStyle4;
-            PositionX.HeaderText = "PositionX";
-            PositionX.MinimumWidth = 8;
-            PositionX.Name = "PositionX";
-            PositionX.ReadOnly = true;
-            PositionX.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            PositionX.Width = 80;
-            // 
-            // PositionY
-            // 
-            dataGridViewCellStyle5.NullValue = null;
-            PositionY.DefaultCellStyle = dataGridViewCellStyle5;
-            PositionY.HeaderText = "PositionY";
-            PositionY.MinimumWidth = 8;
-            PositionY.Name = "PositionY";
-            PositionY.ReadOnly = true;
-            PositionY.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            PositionY.Width = 80;
-            // 
-            // PositionZ
-            // 
-            dataGridViewCellStyle6.NullValue = null;
-            PositionZ.DefaultCellStyle = dataGridViewCellStyle6;
-            PositionZ.HeaderText = "PositionZ";
-            PositionZ.MinimumWidth = 8;
-            PositionZ.Name = "PositionZ";
-            PositionZ.ReadOnly = true;
-            PositionZ.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            PositionZ.Width = 80;
-            // 
-            // Orientation
-            // 
-            dataGridViewCellStyle7.NullValue = null;
-            Orientation.DefaultCellStyle = dataGridViewCellStyle7;
-            Orientation.HeaderText = "Orientation";
-            Orientation.MinimumWidth = 8;
-            Orientation.Name = "Orientation";
-            Orientation.ReadOnly = true;
-            Orientation.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            Orientation.Width = 80;
-            // 
-            // MoveTime
-            // 
-            MoveTime.HeaderText = "MoveTime";
-            MoveTime.MinimumWidth = 8;
-            MoveTime.Name = "MoveTime";
-            MoveTime.ReadOnly = true;
-            MoveTime.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            MoveTime.Width = 80;
-            // 
-            // Delay
-            // 
-            Delay.HeaderText = "Delay";
-            Delay.MinimumWidth = 8;
-            Delay.Name = "Delay";
-            Delay.ReadOnly = true;
-            Delay.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            Delay.Width = 80;
             // 
             // groupBox2
             // 
@@ -568,6 +498,86 @@ namespace WaypointCreatorGen2
             SQLOutputSaveButton.Text = "Save as SQL File";
             SQLOutputSaveButton.Click += SQLOutputSaveButton_Click;
             // 
+            // ID
+            // 
+            ID.HeaderText = "ID";
+            ID.MinimumWidth = 8;
+            ID.Name = "ID";
+            ID.ReadOnly = true;
+            ID.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Programmatic;
+            ID.Width = 50;
+            // 
+            // PositionX
+            // 
+            dataGridViewCellStyle4.NullValue = "0.0";
+            PositionX.DefaultCellStyle = dataGridViewCellStyle4;
+            PositionX.HeaderText = "PositionX";
+            PositionX.MinimumWidth = 8;
+            PositionX.Name = "PositionX";
+            PositionX.ReadOnly = true;
+            PositionX.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            PositionX.Width = 80;
+            // 
+            // PositionY
+            // 
+            dataGridViewCellStyle5.NullValue = null;
+            PositionY.DefaultCellStyle = dataGridViewCellStyle5;
+            PositionY.HeaderText = "PositionY";
+            PositionY.MinimumWidth = 8;
+            PositionY.Name = "PositionY";
+            PositionY.ReadOnly = true;
+            PositionY.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            PositionY.Width = 80;
+            // 
+            // PositionZ
+            // 
+            dataGridViewCellStyle6.NullValue = null;
+            PositionZ.DefaultCellStyle = dataGridViewCellStyle6;
+            PositionZ.HeaderText = "PositionZ";
+            PositionZ.MinimumWidth = 8;
+            PositionZ.Name = "PositionZ";
+            PositionZ.ReadOnly = true;
+            PositionZ.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            PositionZ.Width = 80;
+            // 
+            // Orientation
+            // 
+            dataGridViewCellStyle7.NullValue = null;
+            Orientation.DefaultCellStyle = dataGridViewCellStyle7;
+            Orientation.HeaderText = "Orientation";
+            Orientation.MinimumWidth = 8;
+            Orientation.Name = "Orientation";
+            Orientation.ReadOnly = true;
+            Orientation.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            Orientation.Width = 80;
+            // 
+            // MoveTime
+            // 
+            MoveTime.HeaderText = "MoveTime";
+            MoveTime.MinimumWidth = 8;
+            MoveTime.Name = "MoveTime";
+            MoveTime.ReadOnly = true;
+            MoveTime.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            MoveTime.Width = 80;
+            // 
+            // Delay
+            // 
+            Delay.HeaderText = "Delay";
+            Delay.MinimumWidth = 8;
+            Delay.Name = "Delay";
+            Delay.ReadOnly = true;
+            Delay.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            Delay.Width = 80;
+            // 
+            // PointIdx
+            // 
+            PointIdx.HeaderText = "PointIdx";
+            PointIdx.MinimumWidth = 8;
+            PointIdx.Name = "PointIdx";
+            PointIdx.ReadOnly = true;
+            PointIdx.Visible = false;
+            PointIdx.Width = 150;
+            // 
             // WaypointCreator
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
@@ -619,13 +629,6 @@ namespace WaypointCreatorGen2
         private System.Windows.Forms.ListBox EditorListBox;
         private System.Windows.Forms.DataGridView EditorGridView;
         private System.Windows.Forms.ToolStripLabel EditorLoadingLabel;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ID;
-        private System.Windows.Forms.DataGridViewTextBoxColumn PositionX;
-        private System.Windows.Forms.DataGridViewTextBoxColumn PositionY;
-        private System.Windows.Forms.DataGridViewTextBoxColumn PositionZ;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Orientation;
-        private System.Windows.Forms.DataGridViewTextBoxColumn MoveTime;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Delay;
         private System.Windows.Forms.ContextMenuStrip GridViewContextMenuStrip;
         private System.Windows.Forms.ToolStripMenuItem CutStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem CopyStripMenuItem;
@@ -639,6 +642,14 @@ namespace WaypointCreatorGen2
         private System.Windows.Forms.DataGridViewTextBoxColumn SplineGridViewTextBoxColumn4;
         private System.Windows.Forms.DataGridViewTextBoxColumn SplineGridViewTextBoxColumn5;
         private System.Windows.Forms.Button RemoveDuplicatesButton;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ID;
+        private System.Windows.Forms.DataGridViewTextBoxColumn PositionX;
+        private System.Windows.Forms.DataGridViewTextBoxColumn PositionY;
+        private System.Windows.Forms.DataGridViewTextBoxColumn PositionZ;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Orientation;
+        private System.Windows.Forms.DataGridViewTextBoxColumn MoveTime;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Delay;
+        private System.Windows.Forms.DataGridViewTextBoxColumn PointIdx;
     }
 }
 
