@@ -541,10 +541,11 @@ namespace WaypointCreatorGen2
                     firstRow = row;
 
                 ++rowCount;
+                var nodeId = rowCount - 1;
                 if (rowCount < EditorGridView.Rows.Count)
-                    SQLOutputTextBox.AppendText($"(@PATH, {row.Cells[0].Value}, {row.Cells[1].Value}, {row.Cells[2].Value}, {row.Cells[3].Value}, {row.Cells[4].Value}, {row.Cells[6].Value}),\r\n");
+                    SQLOutputTextBox.AppendText($"(@PATH, {nodeId}, {row.Cells[1].Value}, {row.Cells[2].Value}, {row.Cells[3].Value}, {row.Cells[4].Value}, {row.Cells[6].Value}),\r\n");
                 else
-                    SQLOutputTextBox.AppendText($"(@PATH, {row.Cells[0].Value}, {row.Cells[1].Value}, {row.Cells[2].Value}, {row.Cells[3].Value}, {row.Cells[4].Value}, {row.Cells[6].Value});\r\n");
+                    SQLOutputTextBox.AppendText($"(@PATH, {nodeId}, {row.Cells[1].Value}, {row.Cells[2].Value}, {row.Cells[3].Value}, {row.Cells[4].Value}, {row.Cells[6].Value});\r\n");
             }
 
             SQLOutputTextBox.AppendText("\r\n");
@@ -658,6 +659,8 @@ namespace WaypointCreatorGen2
                 currentPacketNum = wpInfo.PacketNum;
                 AddNodeToDataGrid(wpInfo, count, maxCount, wpList.IndexOf(wpInfo));
             }
+
+            EditorGridView.Rows[EditorGridView.Rows.Count - 1].DefaultCellStyle.BackColor = VirtualPointColor;
 
             BuildGraphPath();
         }
