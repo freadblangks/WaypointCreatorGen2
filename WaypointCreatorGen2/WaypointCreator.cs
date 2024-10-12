@@ -97,10 +97,10 @@ namespace WaypointCreatorGen2
                         for (int i = 0; i < packetHeader.Length; ++i)
                         {
                             if (packetHeader[i].Contains("Time:"))
-                            {
                                 wpInfo.TimeStamp = UInt32.Parse(TimeSpan.Parse(packetHeader[i + 2]).TotalMilliseconds.ToString());
-                                break;
-                            }
+
+                            if (packetHeader[i].Contains("Number:"))
+                                wpInfo.PacketNum = ulong.Parse(packetHeader[i + 1]);
                         }
 
                         // Header noted, reading rest of the packet now
@@ -284,12 +284,31 @@ namespace WaypointCreatorGen2
             if (!wpInfo.IsCyclic())
                 return false;
 
-
             if (count < 2)
                 return true;
 
             int skipLastNum = wpInfo.IsEnterCycle() ? 2 : 1;
             return (maxCount - count) <= skipLastNum;
+        }
+
+        public void AddNodeToDataGrid(WaypointInfo wpInfo, int count, int maxCount, int pointIndex)
+        {
+            string orientation = "NULL";
+            if (wpInfo.Position.Orientation.HasValue)
+                orientation = wpInfo.Position.Orientation.Value.ToString(CultureInfo.InvariantCulture);
+
+            EditorGridView.Rows.Add(
+                count,
+                wpInfo.Position.PositionX.ToString(CultureInfo.InvariantCulture),
+                wpInfo.Position.PositionY.ToString(CultureInfo.InvariantCulture),
+                wpInfo.Position.PositionZ.ToString(CultureInfo.InvariantCulture),
+                orientation,
+                wpInfo.MoveTime,
+                wpInfo.Delay,
+                pointIndex);
+
+            if (IsCyclicVirtualPoint(wpInfo, count, maxCount))
+                EditorGridView.Rows[EditorGridView.Rows.Count - 1].DefaultCellStyle.BackColor = VirtualPointColor;
         }
 
         private void ShowWaypointDataForCreature(UInt32 creatureId, UInt64 lowGUID)
@@ -313,24 +332,9 @@ namespace WaypointCreatorGen2
                 int maxCount = WaypointDatabyCreatureEntry[creatureId][lowGUID].Count;
                 foreach (WaypointInfo wpInfo in WaypointDatabyCreatureEntry[creatureId][lowGUID])
                 {
+                    AddNodeToDataGrid(wpInfo, count, maxCount, count);
+
                     int splineCount = 0;
-                    string orientation = "NULL";
-                    if (wpInfo.Position.Orientation.HasValue)
-                        orientation = wpInfo.Position.Orientation.Value.ToString(CultureInfo.InvariantCulture);
-
-                    EditorGridView.Rows.Add(
-                        count,
-                        wpInfo.Position.PositionX.ToString(CultureInfo.InvariantCulture),
-                        wpInfo.Position.PositionY.ToString(CultureInfo.InvariantCulture),
-                        wpInfo.Position.PositionZ.ToString(CultureInfo.InvariantCulture),
-                        orientation,
-                        wpInfo.MoveTime,
-                        wpInfo.Delay,
-                        count);
-
-                    if (IsCyclicVirtualPoint(wpInfo, count, maxCount))
-                        EditorGridView.Rows[EditorGridView.Rows.Count - 1].DefaultCellStyle.BackColor = VirtualPointColor;
-
                     foreach (Vector3 splineInfo in wpInfo.SplineList)
                     {
                         SplineGridView.Rows.Add(
@@ -637,38 +641,53 @@ namespace WaypointCreatorGen2
             return uniqueWpInfo;
         }
 
-        private void RemoveDuplicatesButton_Click(object sender, EventArgs e)
+        private void RemovePointsFromOtherPackets()
+        {
+            EditorGridView.Rows.Clear();
+
+            var wpList = WaypointDatabyCreatureEntry[SelectedRow.CreatureID][SelectedRow.LowGUID];
+            var maxCount = wpList.Count;
+            ulong? currentPacketNum = null;
+            for (var count = 0; count < maxCount; count++)
+            {
+                var wpInfo = wpList[count];
+
+                if (wpInfo.IsCyclic() && currentPacketNum != null && wpInfo.PacketNum != currentPacketNum)
+                    break;
+
+                currentPacketNum = wpInfo.PacketNum;
+                AddNodeToDataGrid(wpInfo, count, maxCount, wpList.IndexOf(wpInfo));
+            }
+
+            BuildGraphPath();
+        }
+
+        private void RemoveDuplicatePoints()
         {
             EditorGridView.Rows.Clear();
 
             var wpList = WaypointDatabyCreatureEntry[SelectedRow.CreatureID][SelectedRow.LowGUID];
 
             var dedupList = GetDeduplicatedWaypointList(wpList);
-            var count = 0;
             var maxCount = dedupList.Count;
-            foreach (var wpInfo in dedupList)
+            for (var count = 0; count < maxCount; count++)
             {
-                string orientation = "NULL";
-                if (wpInfo.Position.Orientation.HasValue)
-                    orientation = wpInfo.Position.Orientation.Value.ToString(CultureInfo.InvariantCulture);
-
-                EditorGridView.Rows.Add(
-                    count,
-                    wpInfo.Position.PositionX.ToString(CultureInfo.InvariantCulture),
-                    wpInfo.Position.PositionY.ToString(CultureInfo.InvariantCulture),
-                    wpInfo.Position.PositionZ.ToString(CultureInfo.InvariantCulture),
-                    orientation,
-                    wpInfo.MoveTime,
-                    wpInfo.Delay,
-                    count);
-
-                if (IsCyclicVirtualPoint(wpInfo, count, maxCount))
-                    EditorGridView.Rows[EditorGridView.Rows.Count - 1].DefaultCellStyle.BackColor = VirtualPointColor;
-
-                count++;
+                var wpInfo = wpList[count];
+                AddNodeToDataGrid(wpInfo, count, maxCount, wpList.IndexOf(wpInfo));
             }
 
             BuildGraphPath();
+        }
+
+        private void RemoveDuplicatesButton_Click(object sender, EventArgs e)
+        {
+            if (SelectedRow.FirstInfo == null)
+                return;
+
+            if (SelectedRow.FirstInfo.IsCyclic())
+                RemovePointsFromOtherPackets();
+            else
+                RemoveDuplicatePoints();
         }
 
         private void EditorGridView_RowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e)

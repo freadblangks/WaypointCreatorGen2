@@ -17,6 +17,7 @@ namespace WaypointCreatorGen2
         public List<Vector3> SplineList = new List<Vector3>();
         public string Comment = "";
         public MoveSplineFlag SplineFlags = 0;
+        public ulong? PacketNum = null;
 
         public WaypointInfo() { }
 
@@ -29,6 +30,7 @@ namespace WaypointCreatorGen2
             SplineList = rhs.SplineList;
             Comment = rhs.Comment;
             SplineFlags = rhs.SplineFlags;
+            PacketNum = rhs.PacketNum;
         }
 
         public bool IsCatmullrom() { return SplineFlags.HasFlag(MoveSplineFlag.Catmullrom); }
