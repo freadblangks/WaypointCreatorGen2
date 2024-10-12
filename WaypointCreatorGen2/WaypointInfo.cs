@@ -17,7 +17,6 @@ namespace WaypointCreatorGen2
         public List<Vector3> SplineList = new List<Vector3>();
         public string Comment = "";
         public MoveSplineFlag SplineFlags = 0;
-        public bool Hidden = false;
 
         public WaypointInfo() { }
 

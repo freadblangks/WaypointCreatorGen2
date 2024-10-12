@@ -14,6 +14,8 @@ namespace WaypointCreatorGen2
 {
     public partial class WaypointCreator : Form
     {
+        public System.Drawing.Color VirtualPointColor = System.Drawing.Color.LightBlue;
+
         // Dictionary<UInt32 /*CreatureID*/, Dictionary<UInt64 /*lowGUID*/, List<WaypointInfo>>>
         Dictionary<UInt32, Dictionary<UInt64, List<WaypointInfo>>> WaypointDatabyCreatureEntry = new Dictionary<UInt32, Dictionary<UInt64, List<WaypointInfo>>>();
         Dictionary<UInt32, string> CreatureNamesByEntry = new Dictionary<uint, string>();
@@ -56,7 +58,7 @@ namespace WaypointCreatorGen2
                 GridViewContextMenuStrip.Enabled = false;
                 EditorLoadingLabel.Text = "Loading [" + Path.GetFileName(dialog.FileName) + "]...";
 
-                WaypointDatabyCreatureEntry = await Task.Run(()=> GetWaypointDataFromSniff(dialog.FileName));
+                WaypointDatabyCreatureEntry = await Task.Run(() => GetWaypointDataFromSniff(dialog.FileName));
 
                 EditorImportSniffButton.Enabled = true;
                 EditorFilterEntryButton.Enabled = true;
@@ -235,26 +237,6 @@ namespace WaypointCreatorGen2
                     }
                 }
             }
-
-            foreach (var creatureIdRow in result)
-            {
-                foreach (var guidRow in creatureIdRow.Value)
-                {
-                    List<WaypointInfo> rowsToDelete = new List<WaypointInfo>();
-                    WaypointInfo row = guidRow.Value[0];
-
-                    if (row.IsCyclic())
-                    {
-                        for (var i = 0; i < 2; i++)
-                            guidRow.Value[i].Hidden = true;
-
-                        int deleteNum = row.IsEnterCycle() ? 2 : 1;
-                        for (var i = guidRow.Value.Count - deleteNum; i < guidRow.Value.Count; i++)
-                            guidRow.Value[i].Hidden = true;
-                    }
-                }
-            }
-
             return result;
         }
 
@@ -297,6 +279,19 @@ namespace WaypointCreatorGen2
             }
         }
 
+        public bool IsCyclicVirtualPoint(WaypointInfo wpInfo, int count, int maxCount)
+        {
+            if (!wpInfo.IsCyclic())
+                return false;
+
+
+            if (count < 2)
+                return true;
+
+            int skipLastNum = wpInfo.IsEnterCycle() ? 2 : 1;
+            return (maxCount - count) <= skipLastNum;
+        }
+
         private void ShowWaypointDataForCreature(UInt32 creatureId, UInt64 lowGUID)
         {
             // Filling the GridView
@@ -315,11 +310,9 @@ namespace WaypointCreatorGen2
                 SelectedRow.FirstInfo = WaypointDatabyCreatureEntry[creatureId][lowGUID].FirstOrDefault();
 
                 int count = 0;
+                int maxCount = WaypointDatabyCreatureEntry[creatureId][lowGUID].Count;
                 foreach (WaypointInfo wpInfo in WaypointDatabyCreatureEntry[creatureId][lowGUID])
                 {
-                    if (wpInfo.Hidden)
-                        continue;
-
                     int splineCount = 0;
                     string orientation = "NULL";
                     if (wpInfo.Position.Orientation.HasValue)
@@ -333,6 +326,9 @@ namespace WaypointCreatorGen2
                         orientation,
                         wpInfo.MoveTime,
                         wpInfo.Delay);
+
+                    if (IsCyclicVirtualPoint(wpInfo, count, maxCount))
+                        EditorGridView.Rows[EditorGridView.Rows.Count - 1].DefaultCellStyle.BackColor = VirtualPointColor;
 
                     foreach (Vector3 splineInfo in wpInfo.SplineList)
                     {
@@ -444,7 +440,7 @@ namespace WaypointCreatorGen2
             if (CopiedDataGridRows == null || CopiedDataGridRows.Length == 0 || EditorGridView.SelectedRows.Count == 0)
                 return;
 
-            int index = aboveSelection ? EditorGridView.SelectedRows[0].Index: EditorGridView.SelectedRows[EditorGridView.SelectedRows.Count - 1].Index + 1;
+            int index = aboveSelection ? EditorGridView.SelectedRows[0].Index : EditorGridView.SelectedRows[EditorGridView.SelectedRows.Count - 1].Index + 1;
 
             DataGridViewRow[] rowsCopy = new DataGridViewRow[EditorGridView.Rows.Count];
             EditorGridView.Rows.CopyTo(rowsCopy, 0);
@@ -506,8 +502,6 @@ namespace WaypointCreatorGen2
                 if (SelectedRow.FirstInfo.IsCatmullrom())
                 {
                     List<Vector3> points = new List<Vector3>();
-                    var wpList = WaypointDatabyCreatureEntry[SelectedRow.CreatureID][SelectedRow.LowGUID];
-
                     foreach (DataGridViewRow row in EditorGridView.Rows)
                     {
                         points.Add(new Vector3(float.Parse((string)row.Cells[1].Value, CultureInfo.InvariantCulture), float.Parse((string)row.Cells[2].Value, CultureInfo.InvariantCulture), float.Parse((string)row.Cells[3].Value, CultureInfo.InvariantCulture)));
@@ -532,6 +526,9 @@ namespace WaypointCreatorGen2
             DataGridViewRow firstRow = null;
             foreach (DataGridViewRow row in EditorGridView.Rows)
             {
+                if (row.DefaultCellStyle.BackColor == VirtualPointColor)
+                    continue;
+
                 if (rowCount == 0)
                     firstRow = row;
 
@@ -642,8 +639,10 @@ namespace WaypointCreatorGen2
 
             var wpList = WaypointDatabyCreatureEntry[SelectedRow.CreatureID][SelectedRow.LowGUID];
 
+            var dedupList = GetDeduplicatedWaypointList(wpList);
             var count = 0;
-            foreach (var wpInfo in GetDeduplicatedWaypointList(wpList))
+            var maxCount = dedupList.Count;
+            foreach (var wpInfo in dedupList)
             {
                 string orientation = "NULL";
                 if (wpInfo.Position.Orientation.HasValue)
@@ -658,10 +657,29 @@ namespace WaypointCreatorGen2
                     wpInfo.MoveTime,
                     wpInfo.Delay);
 
+                if (IsCyclicVirtualPoint(wpInfo, count, maxCount))
+                    EditorGridView.Rows[EditorGridView.Rows.Count - 1].DefaultCellStyle.BackColor = VirtualPointColor;
+
                 count++;
             }
 
             BuildGraphPath();
+        }
+
+        private void EditorGridView_RowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e)
+        {
+            if (!SelectedRow.FirstInfo.IsCyclic())
+                return;
+
+            var count = 0;
+            var maxCount = EditorGridView.Rows.Count;
+            for (count = 0; count < maxCount; count++)
+            {
+                if (IsCyclicVirtualPoint(SelectedRow.FirstInfo, count, EditorGridView.Rows.Count))
+                    EditorGridView.Rows[count].DefaultCellStyle.BackColor = VirtualPointColor;
+                else
+                    EditorGridView.Rows[count].DefaultCellStyle.BackColor = System.Drawing.Color.White;
+            }
         }
     }
 }
