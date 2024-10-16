@@ -36,5 +36,6 @@ namespace WaypointCreatorGen2
         public bool IsCatmullrom() { return SplineFlags.HasFlag(MoveSplineFlag.Catmullrom); }
         public bool IsCyclic() { return SplineFlags.HasFlag(MoveSplineFlag.Cyclic); }
         public bool IsEnterCycle() { return SplineFlags.HasFlag(MoveSplineFlag.Enter_Cycle); }
+        public bool IsUncompressedPath() { return SplineFlags.HasFlag(MoveSplineFlag.UncompressedPath); }
     }
 }

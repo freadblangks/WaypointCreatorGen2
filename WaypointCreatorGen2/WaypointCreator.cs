@@ -504,7 +504,7 @@ namespace WaypointCreatorGen2
             var flags = 0;
             if (SelectedRow.FirstInfo != null)
             {
-                if (SelectedRow.FirstInfo.IsCyclic())
+                if (SelectedRow.FirstInfo.IsCyclic() || SelectedRow.FirstInfo.IsUncompressedPath())
                     flags = 0x2;
 
                 if (SelectedRow.FirstInfo.IsCatmullrom())
